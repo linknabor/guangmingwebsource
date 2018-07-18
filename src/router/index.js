@@ -1,105 +1,62 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from '@/views/index'//首页
 
-import My from '@/components/my' //我的 
-import Service from '@/components/service' //服务
-import Market from '@/components/market' //集市
-import Community from '@/components/community' //社区
-//绑定房子
-import Myhouse from '@/views/my/myhouse'
-import AddHouse from '@/views/my/add-house'
-import BindHouse from '@/views/my/bind-house'
+//公共组件
+import navwx from '@/components/navwx' //底部导航
 
-//支付
-import Pay from '@/views/pay/pay'
-import PayDetail from '@/views/pay/pay-detail'
-import UptonList from '@/views/pay/upton-list'
+import index from '@/views/shopping/index'  //悦商城首页
+import search from '@/views/search/search'  //搜索商品展示页
+import item from '@/views/shopping/item'    //商品列表
+import onsaledetail from '@/views/shopping/onsaledetail' //商品详情页
+
+import zhifu from '@/views/zhifu/zhifu'//支付页
+import addAddr from '@/views/zhifu/addAddr'//选择地址页
+import editAddr from '@/views/zhifu/editAddr'//填写收货地址
+import cart from '@/views/cart/cart' //购物车
+import classify from '@/views/classify/classify' //商品分类
+
+
 Vue.use(Router)
 
 const router= new Router({
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'Index',
-    //   component: Index,
-  	 //  children:[
-    //   	//{path:'', component: Service },
-    //     {path:'', component: My },//默认暂时设为 我的房子
-    //   	{path:'service',component: Service},
-    //   	{path:'market',component:Market},
-    //   	{path:'community',component:Community},
-   	//   ]
-    // },
-
-    // {
-    //   path:'/',
-    //   name:'Myhouse',
-    //   component:Myhouse
-    // },
-
     {
-      path:'',
-      name:'Pay',
-      component:Pay
+      path:'/',name:'index',component:index,
+      meta:{title:'悦商城'},
+    }, 
+    {
+      path:'/zhifu',name:'zhifu',component:zhifu,
+      meta:{title:'确认订单'}
     },
     {
-    	path :'/my',
-    	name : 'My',
-    	component :My,
-      meta:{
-        title:'我的房子'
-      }
+      path:'/addAddr',name:'addAddr',component:addAddr,
+      meta:{title:'选择地址'}
     },
     {
-      path:'/myhouse',
-      name:'Myhouse',
-      component: Myhouse,
-      meta:{
-        title:'我的房子'
-      }
+      path:'/editAddr',name:'editAddr',component:editAddr,
+      meta:{title:'编辑地址'}
     },
     {
-      path:'/addHouse',
-      name:'AddHouse',
-      component:AddHouse,
-      meta:{
-        title:'添加房子'
-      }
+      path:'/search/:sousuo',name:'search',component:search,
+      meta:{title:'商品列表'}
     },
     {
-      path:'/bindHouse/:number',
-      name:'BindHouse',
-      component:BindHouse,
-      meta:{
-        title:'绑定房子'
-      }
+      path:'/item',name:'item',component:item,
+      meta:{title:'社区集市'}
     },
     {
-      path:'/pay',
-      name:'Pay',
-      component:Pay,
-      meta:{
-        title:'缴费页面'
-      }
+      path:'/onsaledetail',name:'onsaledetail',component:onsaledetail,
+      meta:{title:'商品详情'}
     },
     {
-      path:'/payDetail/:bills/:stmtId/:totalPrice/:reduceMode',
-      name:'payDetail',
-      component:PayDetail,
-      meta:{
-        title:'缴费详情'
-      },
-
+      path:'/cart',name:'cart',component:cart,
+      meta:{title:'购物车'}
     },
     {
-      path:'/uptonList',
-      name:'uptonList',
-      component: UptonList,
-      meta:{
-        title :'优惠券'
-      }
+      path:'/classify',name:'classify',component:classify,
+      meta:{title:'商品分类'}
     }
+    
   ]
 });
 //路由的钩子函数，
@@ -109,9 +66,10 @@ router.beforeEach((to, from, next) => {
     changeTitle(to.meta.title)
     next();
 });
+
 //动态改变title
 function changeTitle(title) {
-    title = title ? title : '和协社区';
+    title = title ? title : '';
     window.document.title = title;
 };
 

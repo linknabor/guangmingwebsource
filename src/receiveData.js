@@ -1,8 +1,12 @@
 import xml2js from'xml2js' 
 var xmlParser = new xml2js.Parser({explicitArray : false, ignoreAttrs : true})
     //xml转json
+import wx from 'weixin-js-sdk';
+
 
 let receiveData = {
+
+
 
     /*
      * 微信配置提取的公共方法
@@ -30,6 +34,36 @@ let receiveData = {
                 console.log('fail', err);
         });
     },
+
+    // chooseWXPay:function(vm,wx,backdataname){
+    //     wx.chooseWXPay({
+    //         timestamp: 0, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+    //         nonceStr: '', // 支付签名随机串，不长于 32 位
+    //         package: '', // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+    //         signType: '', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+    //         paySign: '', // 支付签名
+    //         success: function (res) {
+    //          alert
+    //         }
+    //     })
+    // },
+
+    /*微信拍照或从手机相册中选图接口*/
+    chooseImage:function(vm,wx,backdataname){
+        wx.chooseImage({
+            count: 1, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+            },
+            fail: function (res){
+                console.log("网络不稳定 ，请刷新重试！")
+            }
+        });
+    },
+
+
     /*
       * 微信扫一扫提取的公共方法
      * @param  {objec} vm     [Vue实例]
@@ -80,11 +114,13 @@ let receiveData = {
                 vm[backdataname] = a
                 if (typeof (callback) == 'function') {//回调
                     callback()
+                    
                 }
             })
             .catch(function (err) {
                 //alert('暂放-接口调用失败')
                 console.log(err);
+                // alert(err.message);
             })
     },
    /**
@@ -110,12 +146,20 @@ let receiveData = {
                 if (typeof (callback) == 'function') {//回调
                         callback()
                 }
+
             })
             .catch(function (err) {
+                if(vm.loadingShow){
+                    vm.loadingShow = false;
+                }
+                // if (typeof (failback) == 'function') {//回调
+                //         failback()
+                // }
+                // alert(err.message)
                 console.log('fail', err);
             });
     },
-   /* //将字符串转为xml对象
+    //将字符串转为xml对象
     toxml:function(xmlStr){
         var root = document.createElement('XMLROOT');
         root.innerHTML = xmlStr
@@ -123,25 +167,28 @@ let receiveData = {
     },
 
     //字符串转为json对象
-        loadxml: function(xmlStr){
-            
-            var root = document.createElement('XMLROOT');
-            root.innerHTML = xmlStr;
-            return this.parse(root)
-        },
+    loadxml: function(xmlStr){
         
-        //递归解析 将xml对象转为 json对象
-        parse: function(node){
-            var result = {};
-            for(var i = 0 ; i < node.childNodes.length ; ++i){
-                if(node.childNodes[i].nodeType == 1){//元素节点 继续递归解析
-                    result[node.childNodes[i].nodeName.toLowerCase()] = this.parse(node.childNodes[i]);
-                }else if(node.childNodes[i].nodeType==3){//文本节点 返回
-                    return node.childNodes[i].nodeValue;
-                }
+        var root = document.createElement('XMLROOT');
+        root.innerHTML = xmlStr;
+        return this.parse(root)
+    },
+    
+    //递归解析 将xml对象转为 json对象
+    parse: function(node){
+        var result = {};
+        for(var i = 0 ; i < node.childNodes.length ; ++i){
+            if(node.childNodes[i].nodeType == 1){//元素节点 继续递归解析
+                result[node.childNodes[i].nodeName.toLowerCase()] = this.parse(node.childNodes[i]);
+            }else if(node.childNodes[i].nodeType==3){//文本节点 返回
+                return node.childNodes[i].nodeValue;
             }
-            return result;
-        } */
-}
+        }
+        return result;
+    } ,
+
+
+
+};
 
 export default receiveData;

@@ -8,9 +8,9 @@ const path = require('path')
 module.exports = {
   build: {
     env: require('./prod.env'),
-    index: path.resolve(__dirname, '../dist/index.html'),
+    index: path.resolve(__dirname, '../dist/onsalesindex.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'static', //放置静态文件的目录
+    assetsSubDirectory: 'shoppingtest', //放置静态文件的目录
     assetsPublicPath: './', //放置静态文件的路径
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
@@ -29,7 +29,7 @@ module.exports = {
     env: require('./dev.env'),
     port: process.env.PORT || 80,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'static',
+    assetsSubDirectory: 'shoppingtest',
     assetsPublicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"
