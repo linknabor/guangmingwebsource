@@ -1,4 +1,4 @@
-<style scoped>
+<style >
 [v-cloak] {
  display: none;
 }
@@ -20,7 +20,7 @@ li{list-style: none;}
 .dp{margin-left: 5%;line-height: 0.8rem;font-size: 14px;}
 .dp-icon{width: 22px;height: 22px;line-height: 0.8rem;top: 0.1rem; color: #999;font-size: 16px; display: inline-block;position:relative;left: 0.4rem;}
 .dp-icon span{width: 100%;height: 100%;margin: auto;display: inline-block;background-image: url(../../assets/wuye/sp.png);background-size: 100%;background-repeat: no-repeat;}
-.item{width: 84%;height: 2.5rem;display: flex;margin: 0 auto;justify-content:center;align-items:center;border-bottom: 1px solid #e0e0e0;}
+.main .list .item{width: 84%;height: 2.5rem;display: flex;margin: 0 auto;justify-content:center;align-items:center;border-bottom: 1px solid #e0e0e0;}
 .item:last-child{border-bottom: none}
 .item-select{width: 1.2rem;margin-top: 15px;}
 .yuan1{border:1px solid #ccc;width: 20px;height: 20px;display: inline-block;border-radius: 50%;/*position: absolute;top: 50%;margin-top: -10px;*/}
@@ -95,6 +95,67 @@ li{list-style: none;}
 .price-color{font-size: 12px;color: #bd2630;font-weight: 600;}
 .hotli-danwei{display:inline-block;font-size: 10px;transform: scale(0.8);}
 .hotli-num{float: right;display:inline-block;font-size: 10px;transform: scale(0.8);color: #666;padding-right: 2px;padding-top: 2px;}
+.btn-deleted {  
+    width: 2rem;
+    height: 2.5rem;
+    background: #ff4949;
+    font-size: 17px;
+    color: #fff;
+    text-align: center;
+    line-height: 2.5rem;
+    position: absolute;
+    /* top: 0; */
+    right: -2.7rem;}
+
+/* miut修改样式	 */
+ .list .mint-cell-title {
+    /* -webkit-box-flex: 1; */
+    /* -ms-flex: 1; */
+    /* flex: 1; */
+}
+.list .mint-cell-wrapper {
+    background-image: -webkit-linear-gradient(top, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-image: linear-gradient(180deg, #d9d9d9, #d9d9d9 50%, transparent 50%);
+    background-size: 120% 1px;
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-origin: content-box;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-size: 16px;
+    line-height: 1;
+    min-height: inherit;
+    overflow: hidden;
+    padding: 0px;
+    width: 100%;
+}
+.list .mint-cell-wrapper .mint-cell-value {
+    color: #888;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    width: 100%;
+}
+.list .mint-cell-swipe-buttongroup {
+    height: 100%;
+	display:table;
+	background-color:red;
+}
+.list .mint-cell-swipe-button {
+    height: 100%;
+    display: inline-block;
+    padding: 0 10px;
+    line-height: 48px;
+	vertical-align:middle;display:table-cell;
+}
 </style>
 <template>
 	<div id="cart" v-cloak>
@@ -117,15 +178,24 @@ li{list-style: none;}
 		<div class="main" v-if="item">
 			<ul class="list">
 			    <!-- 列表循环 -->
-				<li v-for="(item,index) in cart" @click.capture="mp(index,$event)">
+				<li v-for="(item,index) in cart" @click.capture="mp(index,$event)" :key="index">
 					<!-- 商家 -->
 					<p class="list-dp" >
 						<span :class="[yuan1,{bg:item.b}]" @click.stop="dpSelected(index)"></span>
 						<span class="dp-icon"><span></span></span>
 						<span class="dp">{{item.merchantName}}</span>
 					</p>
-					<!-- 图片产品名称价格数量展示 -->
-					<div class="item" v-for="(pl,index) in cart[index].items" >
+					<!-- 图片产品名称价格数量展示   左移删除-->
+<mt-cell-swipe 
+ v-for="(pl,index) in cart[index].items" :key="pl.sku.id"
+      :right="[{
+			content: '删除',
+				style: { background: 'red', color: '#fff' },
+				handler: () => deleteSection(pl.ruleId,pl.sku.id,index)
+		}]"
+ >	
+					<div class="item"   ref="removes">
+					
 						<!-- 选择按钮 -->
 						<p class="item-select">
 							<span :class="[yuan,{bg:pl.c},animateAn]"  @click.capture="selected(index,$event)"></span>
@@ -140,7 +210,7 @@ li{list-style: none;}
 								<span @click="reduce(index)">-</span>
 								<input class="text-sl" type="text" readonly v-model="pl.amount">
 								<span @click="add(index)">+</span>
-								<p @click="del(index)" class="sc">删除</p>
+								<p @click="del(pl.ruleId,index)" class="sc">删除</p>
 							</div>
 							<div  class="Hide" @click="Hide(index)">
 								完成
@@ -161,8 +231,9 @@ li{list-style: none;}
 							<!-- <p class="item-sl">
 								x{{pl.amount}}
 							</p> -->
-						</div>	
+						</div>
 					</div>
+	</mt-cell-swipe>
 				</li>
 			</ul>
 		</div>
@@ -256,6 +327,31 @@ li{list-style: none;}
 	  		vm.shopshow();
 		},
 		methods:{
+			deleteSection(id,idd,index) {
+				let ab = {
+					amount:0,
+					ruleId:id,
+					skuId:idd,
+				};
+				let urladdCart = "/shopping/buyerCart";
+				let that=this;
+				vm.receiveData.getData(vm,urladdCart,"addCartData",function(){			
+					for(var i=0;i<that.cart.length;i++) {
+								for(var j=0;j<that.cart[i].items.length;j++) {
+									if(that.cart[i].items[j].ruleId==id) {
+										that.cart[i].items.splice(index,1)
+									}
+									if(that.cart[i].items.length==0) {
+											that.cart.splice(i,1)
+									}
+									if(that.cart.length==0){
+												location.reload();
+									}
+										}
+								}
+				},ab)
+				},
+			
 			toCart(){
 
 				let url = "/shopping/toCart";
@@ -499,28 +595,37 @@ li{list-style: none;}
 				},ab)
 				this.price();
 			},			
-			del(index){
-				
-				
+			del(id,index){
 				let ab = {
 					amount:0,
 					ruleId:this.cart[this.Index].items[index].ruleId,
 					skuId:this.cart[this.Index].items[index].sku.id
 				};
 				let urladdCart = "/shopping/buyerCart";
+				let that=this;
 				vm.receiveData.getData(vm,urladdCart,"addCartData",function(){			
-					if(!vm.addCartData.success){
-						alert(vm.addCartData.message);
-					}
+							for(var i=0;i<that.cart.length;i++) {
+								for(var j=0;j<that.cart[i].items.length;j++) {
+										if(that.cart[i].items[j].ruleId==id) {
+											that.cart[i].items.splice(index,1)
+										}
+										if(that.cart[i].items.length==0) {
+											that.cart.splice(i,1)
+										}
+										if(that.cart.length==0){
+													location.reload();
+										}
+								}
+				}
 				},ab)
-				
-				this.cart[this.Index].items.splice(index,1);
-				
-				if(this.cart[this.Index].items.length==0){
-					location.reload();
+				// this.cart[this.Index].items.splice(index,1);
+			
+				// if(this.cart[this.Index].items.length==0){
+					// location.reload();
 				// 	// this.cart[this.Index].showw=false;
 				// 	// alert(this.cart[this.Index].showw);
-				}
+				// }
+				
 				
 				
 					
